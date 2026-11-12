@@ -2,77 +2,93 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Models\PassengerTicket;
-use App\Models\TerminalTrip;
-
-use App\Http\Requests\StorePassengerTicketRequest;
-use App\Http\Requests\UpdatePassengerTicketRequest;
 
 class PassengerTicketController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Display Passenger Tickets
-    |--------------------------------------------------------------------------
-    */
-
+    // Display all passenger tickets
     public function index()
     {
-        $tickets = PassengerTicket::with([
-            'terminalTrip.bus',
-            'terminalTrip.driver'
-        ])
-            ->latest()
-            ->paginate(10);
+        $tickets = PassengerTicket::all();
 
-        return view('passenger-tickets.index', compact('tickets'));
+        return view('passenger_tickets.index', compact('tickets'));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Create Ticket Form
-    |--------------------------------------------------------------------------
-    */
-
+    // Show the ticket booking form
     public function create()
     {
-        $trips = TerminalTrip::with('bus')
-            ->where('trip_status', 'scheduled')
-            ->get();
-
-        return view('passenger-tickets.create', compact('trips'));
+        return view('passenger_tickets.create');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Store Passenger Ticket
-    |--------------------------------------------------------------------------
-    */
-
-    public function store(StorePassengerTicketRequest $request)
+    // Store a new passenger ticket
+    public function store(Request $request)
     {
-        PassengerTicket::create($request->validated());
+        $request->validate([
+            'passenger_name' => 'required|string|max:255',
+            'destination' => 'required|string|max:255',
+            'travel_date' => 'required|date',
+            'ticket_price' => 'required|numeric|min:0',
+        ]);
 
-        return redirect()
-            ->route('passenger-tickets.index')
-            ->with('success', 'Passenger ticket successfully created.');
+        PassengerTicket::create([
+            'passenger_name' => $request->passenger_name,
+            'destination' => $request->destination,
+            'travel_date' => $request->travel_date,
+            'ticket_price' => $request->ticket_price,
+        ]);
+
+        return redirect()->route('passenger-tickets.index')
+            ->with('success', 'Passenger ticket booked successfully!');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Update Passenger Ticket
-    |--------------------------------------------------------------------------
-    */
+    // Display a specific ticket
+    public function show($id)
+    {
+        $ticket = PassengerTicket::findOrFail($id);
 
-    public function update(
-        UpdatePassengerTicketRequest $request,
-        $id
-    ) {
-        $ticket = PassengerTicket::findOrFail((int) $id);
-        $ticket->update($request->validated());
+        return view('passenger_tickets.show', compact('ticket'));
+    }
 
-        return redirect()
-            ->route('passenger-tickets.index')
-            ->with('success', 'Passenger ticket successfully updated.');
+    // Show the edit form
+    public function edit($id)
+    {
+        $ticket = PassengerTicket::findOrFail($id);
+
+        return view('passenger_tickets.edit', compact('ticket'));
+    }
+
+    // Update ticket information
+    public function update(Request $request, $id)
+    {
+        $ticket = PassengerTicket::findOrFail($id);
+
+        $request->validate([
+            'passenger_name' => 'required|string|max:255',
+            'destination' => 'required|string|max:255',
+            'travel_date' => 'required|date',
+            'ticket_price' => 'required|numeric|min:0',
+        ]);
+
+        $ticket->update($request->only([
+            'passenger_name',
+            'destination',
+            'travel_date',
+            'ticket_price',
+        ]));
+
+        return redirect()->route('passenger-tickets.index')
+            ->with('success', 'Ticket updated successfully!');
+    }
+
+    // Delete a ticket
+    public function destroy($id)
+    {
+        $ticket = PassengerTicket::findOrFail($id);
+
+        $ticket->delete();
+
+        return redirect()->route('passenger-tickets.index')
+            ->with('success', 'Ticket deleted successfully!');
     }
 }

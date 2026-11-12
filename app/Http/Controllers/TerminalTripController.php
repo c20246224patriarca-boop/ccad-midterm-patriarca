@@ -2,98 +2,93 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Bus;
-use App\Models\Driver;
+use Illuminate\Http\Request;
 use App\Models\TerminalTrip;
-
-use Illuminate\Contracts\Container\Container;
-
-use App\Http\Requests\StoreTerminalTripRequest;
-use App\Http\Requests\UpdateTerminalTripRequest;
 
 class TerminalTripController extends Controller
 {
-    protected mixed $service;
-
-    public function __construct(Container $container)
-    {
-        $this->service = $container->make('App\\Services\\TerminalDispatchService');
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Display All Trips
-    |--------------------------------------------------------------------------
-    */
-
+    // Display all terminal trips
     public function index()
     {
-        $trips = TerminalTrip::with([
-            'bus.busCompany',
-            'driver',
-            'passengerTickets'
-        ])
-            ->latest()
-            ->paginate(10);
+        $trips = TerminalTrip::all();
 
-        return view('terminal-trips.index', compact('trips'));
+        return view('terminal_trips.index', compact('trips'));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Create Trip Form
-    |--------------------------------------------------------------------------
-    */
-
+    // Show the create trip form
     public function create()
     {
-        $buses = Bus::with('busCompany')
-            ->where('is_inspected', true)
-            ->get();
-
-        $drivers = Driver::where('status', 'active')
-            ->get();
-
-        return view(
-            'terminal-trips.create',
-            compact('buses', 'drivers')
-        );
+        return view('terminal_trips.create');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Store New Trip
-    |--------------------------------------------------------------------------
-    */
-
-    public function store(StoreTerminalTripRequest $request)
+    // Store a new terminal trip
+    public function store(Request $request)
     {
-        $trip = $this->service->createTrip(
-            $request->validated()
-        );
+        $request->validate([
+            'terminal_name' => 'required|string|max:255',
+            'destination' => 'required|string|max:255',
+            'departure_time' => 'required|date',
+            'fare' => 'required|numeric|min:0',
+        ]);
 
-        return redirect()
-            ->route('terminal-trips.index')
-            ->with('success', 'Trip successfully created.');
+        TerminalTrip::create([
+            'terminal_name' => $request->terminal_name,
+            'destination' => $request->destination,
+            'departure_time' => $request->departure_time,
+            'fare' => $request->fare,
+        ]);
+
+        return redirect()->route('terminal-trips.index')
+            ->with('success', 'Terminal trip added successfully!');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Update Existing Trip
-    |--------------------------------------------------------------------------
-    */
+    // Display a specific trip
+    public function show($id)
+    {
+        $trip = TerminalTrip::findOrFail($id);
 
-    public function update(
-        UpdateTerminalTripRequest $request,
-        $id
-    ) {
-        $this->service->updateTrip(
-            $request->validated(),
-            (int) $id
-        );
+        return view('terminal_trips.show', compact('trip'));
+    }
 
-        return redirect()
-            ->route('terminal-trips.index')
-            ->with('success', 'Trip successfully updated.');
+    // Show the edit trip form
+    public function edit($id)
+    {
+        $trip = TerminalTrip::findOrFail($id);
+
+        return view('terminal_trips.edit', compact('trip'));
+    }
+
+    // Update trip information
+    public function update(Request $request, $id)
+    {
+        $trip = TerminalTrip::findOrFail($id);
+
+        $request->validate([
+            'terminal_name' => 'required|string|max:255',
+            'destination' => 'required|string|max:255',
+            'departure_time' => 'required|date',
+            'fare' => 'required|numeric|min:0',
+        ]);
+
+        $trip->update($request->only([
+            'terminal_name',
+            'destination',
+            'departure_time',
+            'fare',
+        ]));
+
+        return redirect()->route('terminal-trips.index')
+            ->with('success', 'Terminal trip updated successfully!');
+    }
+
+    // Delete a trip
+    public function destroy($id)
+    {
+        $trip = TerminalTrip::findOrFail($id);
+
+        $trip->delete();
+
+        return redirect()->route('terminal-trips.index')
+            ->with('success', 'Terminal trip deleted successfully!');
     }
 }
