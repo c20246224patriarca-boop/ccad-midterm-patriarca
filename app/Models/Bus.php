@@ -23,6 +23,11 @@ class Bus extends Model
         ];
     }
 
+    public function setBusPlateAttribute(string $value): void
+    {
+        $this->attributes['bus_plate'] = strtoupper(trim($value));
+    }
+
     public function busCompany(): BelongsTo
     {
         return $this->belongsTo(BusCompany::class);

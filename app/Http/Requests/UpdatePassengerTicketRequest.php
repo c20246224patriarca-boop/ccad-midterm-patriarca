@@ -8,7 +8,7 @@ class UpdatePassengerTicketRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user() !== null;
     }
 
     public function rules(): array
@@ -18,27 +18,27 @@ class UpdatePassengerTicketRequest extends FormRequest
                 'sometimes',
                 'required',
                 'string',
-                'max:255'
+                'max:255',
             ],
 
             'passenger_email' => [
                 'sometimes',
                 'nullable',
                 'email',
-                'max:255'
+                'max:255',
             ],
 
             'seat_number' => [
                 'sometimes',
                 'required',
                 'integer',
-                'min:1'
+                'min:1',
             ],
 
             'status' => [
                 'sometimes',
                 'required',
-                'in:booked,cancelled'
+                'in:booked,cancelled',
             ],
         ];
     }
@@ -50,6 +50,7 @@ class UpdatePassengerTicketRequest extends FormRequest
             'passenger_email.email' => 'Enter a valid email.',
             'seat_number.min' => 'Seat number must be at least 1.',
             'status.in' => 'Invalid ticket status.',
+            'status.required' => 'Ticket status is required when changing status.',
         ];
     }
 }

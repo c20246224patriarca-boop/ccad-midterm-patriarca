@@ -12,14 +12,12 @@ class PassengerTicket extends Model
         'passenger_name',
         'passenger_email',
         'seat_number',
-        'ticket_price',
         'status',
     ];
 
     protected function casts(): array
     {
         return [
-            'ticket_price' => 'decimal:2',
             'seat_number' => 'integer',
         ];
     }

@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TerminalTrip extends Model
 {
+    protected $appends = [
+        'booked_seats',
+        'gross_revenue',
+    ];
+
     protected $fillable = [
         'bus_id',
         'driver_id',
@@ -43,6 +48,12 @@ class TerminalTrip extends Model
 
     public function getBookedSeatsAttribute(): int
     {
+        if ($this->relationLoaded('passengerTickets')) {
+            return $this->passengerTickets
+                ->where('status', 'booked')
+                ->count();
+        }
+
         return $this->passengerTickets()
             ->where('status', 'booked')
             ->count();

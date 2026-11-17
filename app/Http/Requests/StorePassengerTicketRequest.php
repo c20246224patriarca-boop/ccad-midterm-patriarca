@@ -8,7 +8,7 @@ class StorePassengerTicketRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user() !== null;
     }
 
     public function rules(): array
@@ -16,30 +16,30 @@ class StorePassengerTicketRequest extends FormRequest
         return [
             'terminal_trip_id' => [
                 'required',
-                'exists:terminal_trips,id'
+                'exists:terminal_trips,id',
             ],
 
             'passenger_name' => [
                 'required',
                 'string',
-                'max:255'
+                'max:255',
             ],
 
             'passenger_email' => [
                 'nullable',
                 'email',
-                'max:255'
+                'max:255',
             ],
 
             'seat_number' => [
                 'required',
                 'integer',
-                'min:1'
+                'min:1',
             ],
 
             'status' => [
                 'sometimes',
-                'in:booked,cancelled'
+                'in:booked,cancelled',
             ],
         ];
     }
@@ -52,6 +52,7 @@ class StorePassengerTicketRequest extends FormRequest
             'passenger_email.email' => 'Enter a valid email address.',
             'seat_number.required' => 'Seat number is required.',
             'seat_number.min' => 'Seat number must be at least 1.',
+            'status.in' => 'Select a valid ticket status.',
         ];
     }
 }

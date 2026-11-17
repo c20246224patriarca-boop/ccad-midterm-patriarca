@@ -24,14 +24,14 @@ return new class extends Migration
 
             $table->enum('status', [
                 'booked',
-                'cancelled'
+                'cancelled',
             ])->default('booked');
 
             $table->timestamps();
 
             $table->unique([
                 'terminal_trip_id',
-                'seat_number'
+                'seat_number',
             ]);
 
             $table->index('status');

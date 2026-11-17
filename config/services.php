@@ -1,3 +1,4 @@
+
 <?php
 
 return [
@@ -6,12 +7,6 @@ return [
     |--------------------------------------------------------------------------
     | Third Party Services
     |--------------------------------------------------------------------------
-    |
-    | This file is for storing the credentials for third party services such
-    | as Mailgun, Postmark, AWS and more. This file provides the de facto
-    | location for this type of information, allowing packages to have
-    | a conventional file to locate the various service credentials.
-    |
     */
 
     'postmark' => [
@@ -33,6 +28,34 @@ return [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Municipal Bus Terminal System
+    |--------------------------------------------------------------------------
+    */
+
+    'bus_terminal' => [
+        'name' => env(
+            'BUS_TERMINAL_NAME',
+            'Municipal Bus Terminal'
+        ),
+
+        'location' => env(
+            'BUS_TERMINAL_LOCATION',
+            'Municipal Terminal'
+        ),
+
+        'contact' => env(
+            'BUS_TERMINAL_CONTACT',
+            ''
+        ),
+
+        'email' => env(
+            'BUS_TERMINAL_EMAIL',
+            ''
+        ),
     ],
 
 ];

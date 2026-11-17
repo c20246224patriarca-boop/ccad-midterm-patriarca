@@ -8,7 +8,7 @@ class UpdateTerminalTripRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user() !== null;
     }
 
     public function rules(): array
@@ -17,20 +17,20 @@ class UpdateTerminalTripRequest extends FormRequest
             'bus_id' => [
                 'sometimes',
                 'required',
-                'exists:buses,id'
+                'exists:buses,id',
             ],
 
             'driver_id' => [
                 'sometimes',
                 'required',
-                'exists:drivers,id'
+                'exists:drivers,id',
             ],
 
             'route_origin' => [
                 'sometimes',
                 'required',
                 'string',
-                'max:255'
+                'max:255',
             ],
 
             'route_destination' => [
@@ -38,26 +38,26 @@ class UpdateTerminalTripRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                'different:route_origin'
+                'different:route_origin',
             ],
 
             'departure_time' => [
                 'sometimes',
                 'required',
                 'date',
-                'after:now'
+                'after:now',
             ],
 
             'ticket_price' => [
                 'sometimes',
                 'required',
                 'numeric',
-                'min:0.01'
+                'min:0.01',
             ],
 
             'trip_status' => [
                 'sometimes',
-                'in:scheduled,departed,completed,cancelled'
+                'in:scheduled,departed,completed,cancelled',
             ],
         ];
     }
@@ -69,6 +69,7 @@ class UpdateTerminalTripRequest extends FormRequest
             'driver_id.exists' => 'Selected driver is invalid.',
             'departure_time.after' => 'Departure must be in the future.',
             'ticket_price.min' => 'Ticket price must be greater than zero.',
+            'trip_status.in' => 'Select a valid trip status.',
         ];
     }
 }
