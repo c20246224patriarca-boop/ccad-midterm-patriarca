@@ -37,3 +37,4 @@ php artisan db:seed --class=BusTerminalDemoSeeder
 The demo data is isolated by its `DEMO-` bus plates and can be seeded again without creating duplicate trips or tickets.
 # ccad-midterm-patriarca1
 # ccad-midterm-patriarca1
+# ccad-midterm-patriarca1
